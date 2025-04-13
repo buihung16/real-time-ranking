@@ -1,0 +1,417 @@
+basePath: /
+definitions:
+  models.CreateVideoRequest:
+    properties:
+      data:
+        type: string
+      title:
+        maxLength: 255
+        minLength: 1
+        type: string
+    required:
+    - data
+    - title
+    type: object
+  models.UpdateUserPreferencesRequest:
+    properties:
+      categories:
+        items:
+          type: string
+        type: array
+    required:
+    - categories
+    type: object
+  models.UpdateVideoRequest:
+    properties:
+      data:
+        type: string
+      title:
+        maxLength: 255
+        minLength: 1
+        type: string
+    required:
+    - data
+    - title
+    type: object
+  models.Video:
+    properties:
+      comments:
+        type: integer
+      createdAt:
+        type: string
+      data:
+        type: string
+      id:
+        type: string
+      likes:
+        type: integer
+      score:
+        type: number
+      shares:
+        type: integer
+      title:
+        type: string
+      updatedAt:
+        type: string
+      views:
+        type: integer
+      watchTime:
+        type: integer
+    type: object
+  videos.ErrorResponse:
+    properties:
+      details:
+        type: string
+      message:
+        type: string
+    type: object
+  videos.SuccessResponse:
+    properties:
+      message:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API for managing and retrieving real-time video rankings.
+  title: Real-time Ranking API
+  version: "1.0"
+paths:
+  /users/{userID}/preferences:
+    post:
+      consumes:
+      - application/json
+      description: Updates a user's video category preferences
+      parameters:
+      - description: User ID
+        in: path
+        name: userID
+        required: true
+        type: string
+      - description: User's video category preferences
+        in: body
+        name: prefs
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateUserPreferencesRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/videos.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/videos.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/videos.ErrorResponse'
+      summary: Update user's video category preferences
+      tags:
+      - users
+  /users/{userID}/videos/top:
+    get:
+      description: Retrieve the top-ranked videos for a specific user
+      parameters:
+      - description: User ID
+        in: path
+        name: userID
+        required: true
+        type: string
+      - description: Start index
+        in: query
+        name: start
+        type: integer
+      - description: Number of videos to retrieve
+        in: query
+        name: count
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Video'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/videos.ErrorResponse'
+      summary: Get top-ranked videos for a user
+      tags:
+      - users
+  /videos:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new video with the given title and Base64 encoded data
+      parameters:
+      - description: Video object to be created
+        in: body
+        name: video
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateVideoRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Video'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/videos.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/videos.ErrorResponse'
+      summary: Create a new video
+      tags:
+      - videos
+  /videos/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Updates a video's title and Base64 encoded data
+      parameters:
+      - description: Video ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Video object to be updated
+        in: body
+        name: video
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateVideoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Video'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/videos.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/videos.ErrorResponse'
+      summary: Update video
+      tags:
+      - videos
+  /videos/{id}/comment:
+    post:
+      consumes:
+      - application/json
+      description: Records a video comment and updates the score
+      parameters:
+      - description: Video ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User ID
+        in: query
+        name: userID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/videos.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/videos.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/videos.ErrorResponse'
+      summary: Handle video comment event
+      tags:
+      - videos
+  /videos/{id}/like:
+    post:
+      consumes:
+      - application/json
+      description: Records a video like and updates the score
+      parameters:
+      - description: Video ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User ID
+        in: query
+        name: userID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/videos.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/videos.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/videos.ErrorResponse'
+      summary: Handle video like event
+      tags:
+      - videos
+  /videos/{id}/share:
+    post:
+      consumes:
+      - application/json
+      description: Records a video share and updates the score
+      parameters:
+      - description: Video ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User ID
+        in: query
+        name: userID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/videos.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/videos.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/videos.ErrorResponse'
+      summary: Handle video share event
+      tags:
+      - videos
+  /videos/{id}/view:
+    post:
+      consumes:
+      - application/json
+      description: Records a video view and updates the score
+      parameters:
+      - description: Video ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User ID
+        in: query
+        name: userID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/videos.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/videos.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/videos.ErrorResponse'
+      summary: Handle video view event
+      tags:
+      - videos
+  /videos/{id}/watch:
+    post:
+      consumes:
+      - application/json
+      description: Records the amount of time a user watched a specific video and
+        updates the video's watch time and potentially its ranking.
+      parameters:
+      - description: Video ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User ID
+        in: query
+        name: userID
+        required: true
+        type: string
+      - description: Duration
+        in: query
+        name: duration
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/videos.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/videos.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/videos.ErrorResponse'
+      summary: Record video watch time
+      tags:
+      - videos
+  /videos/top:
+    get:
+      description: Retrieve the top-ranked videos
+      parameters:
+      - description: Start index
+        in: query
+        name: start
+        type: integer
+      - description: Number of videos to retrieve
+        in: query
+        name: count
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Video'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/videos.ErrorResponse'
+      summary: Get top-ranked videos
+      tags:
+      - videos
+swagger: "2.0"
