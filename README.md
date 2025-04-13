@@ -57,8 +57,3 @@ These can be set either in your environment or in the `docker-compose.yaml` file
 - `GET /videos/top`: Get top-ranked videos.
 - `GET /users/{userID}/videos/top`: Get top-ranked videos for a user.
 - `POST /users/{userID}/preferences`: Update user preferences.
-
-##   Notes
-
--   This README provides basic setup instructions. For production deployments, you'll need more robust configuration, security, and monitoring.
--   The `getVideoCategoryMap` function in `services/services.go` is a placeholder. You'll need to implement actual logic to retrieve video categories.
